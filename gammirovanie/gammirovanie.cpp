@@ -66,6 +66,39 @@ int addBinary(int a, int b)
     return result;
 }
 
+int subtractBinary(int a, int b) {
+    int result = 0; // Результат вычитания
+    int borrow = 0; // Заимствование
+    int power = 1;  // Текущая степень десяти
+
+    while (a > 0 || b > 0 || borrow != 0) {
+        // Извлекаем младшие разряды
+        int bitA = a % 10;
+        int bitB = b % 10;
+
+        // Вычитаем и учитываем заимствование
+        int sub = bitA - bitB - borrow;
+
+        if (sub < 0) {
+            sub += 2; // Добавляем 2, если не хватает
+            borrow = 1; // Устанавливаем заимствование
+        }
+        else {
+            borrow = 0; // Сбрасываем заимствование
+        }
+
+        // Формируем результат
+        result += sub * power;
+
+        // Переходим к следующему разряду
+        power *= 10;
+        a /= 10;
+        b /= 10;
+    }
+
+    return result;
+}
+
 int main()
 {
     setlocale(LC_ALL, "russian");
@@ -83,7 +116,9 @@ int main()
         cout << "1. Введите '1' для введения текста и ключа" << endl;
         cout << "2. Введите '2' для шифрования текста" << endl;
         cout << "3. Введите '3' для вывода зашифрованного текста" << endl;
-        cout << "4. Введите '0' для завершения работы программы" << endl;
+        cout << "4. Введите '4' для декодирования текста при помощи ключа" << endl;
+        cout << "5. Введите '5' для вывода дешифрованного текста" << endl;
+        cout << "6. Введите '0' для завершения работы программы" << endl;
         cout << "Выберите нужный вам пункт и введите нужное значение с клавиатуры: ";
         int menu;
         cin >> menu;
@@ -170,6 +205,58 @@ int main()
             for (int i = 0; i < n - 1; i++)
             {
                 shifr[i] = static_cast<char>(ascii[i]);
+                cout << shifr[i];
+            }
+            cout << endl;
+            break;
+
+        case(4):
+            if (ascii == nullptr)
+            {
+                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+                break;
+            }
+            // Преобразование из char в ASCII и дешифрование
+            for (int i = 0; i < n - 1; i++)
+            {
+                ascii[i] = static_cast<int>(shifr[i]);
+                int binary = decimalToBinary(ascii[i]);
+                // Декодирование при помощи ключа
+                int decodedBinary = subtractBinary(binary, key);
+                // Перевод из двоичной в десятичную
+                int ASCII = binaryToDecimal(decodedBinary);
+                // Проверка на выхождение за пределы ASCII кода
+                if (ASCII < 0)
+                    ascii[i] = 0;
+                else if (ASCII > 255)
+                {
+                    int ASCII_change = ASCII;
+                    int k = 0;
+                    while (ASCII_change > 255)
+                    {
+                        ASCII_change -= 255;
+                        k++;
+                    }
+                    ascii[i] = ASCII - 255 * k;
+                }
+                else
+                    ascii[i] = ASCII;
+
+                // Запись дешифрованного символа в массив
+                shifr[i] = static_cast<char>(ascii[i]);
+            }
+            break;
+
+        case(5):
+            if (ascii == nullptr) {
+                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+                break;
+            }
+
+            // Преобразование из ASCII в char и вывод
+            cout << "Дешифрованный текст: ";
+            for (int i = 0; i < n - 1; i++)
+            {
                 cout << shifr[i];
             }
             cout << endl;
