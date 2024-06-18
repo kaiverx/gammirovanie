@@ -17,6 +17,33 @@ int decimalToBinaryInt(int k) {
 	return binaryNum;
 }
 
+int addBinary(int a, int b) {
+	int result = 0; // Результат сложения
+	int carry = 0;  // Перенос
+	int power = 1;  // Текущая степень двойки
+
+	while (a > 0 || b > 0 || carry > 0) {
+		// Извлекаем младшие разряды
+		int bitA = a % 10;
+		int bitB = b % 10;
+
+		// Считаем сумму и перенос
+		int sum = bitA + bitB + carry;
+		carry = sum / 2;
+		sum = sum % 2;
+
+		// Формируем результат
+		result += sum * power;
+
+		// Переходим к следующему разряду
+		power *= 10;
+		a /= 10;
+		b /= 10;
+	}
+
+	return result;
+}
+
 int main()
 {
 	setlocale(LC_ALL, "russian");
@@ -47,36 +74,22 @@ int main()
 	cout << endl;
 
 	//преобразование из char в ascii
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n-1; i++)
 	{
 		ascii[i] = static_cast<int>(shifr[i]);
 		//cout << "ASCII i " << i << ": " << ascii[i] << " -> ";
 		int binary = decimalToBinaryInt(ascii[i]);
 		//cout << "Binary: " << binary << endl;
-		ascii[i] = binary;
+		//кодирование при помощи ключа
+		ascii[i] = addBinary(binary, key);
 		//cout << "ASCII i " << i << ": " << ascii[i]<<endl;
-
 	}
 
-	/*
-	//проверка правильности перевода
-	for (int i = 0; i < n; i++)
-	{
-		cout << "i " << i <<" " << ascii[i] << endl;
-	}*/
-
 	//преобразование из ascii в char
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n-1; i++)
 	{
 		shifr[i] = static_cast<char>(ascii[i]);
 	}
-
-	/*
-	//проверка правильности перевода
-	for (int i = 0; i < n; i++)
-	{
-		cout << "i " << i << " " << shifr[i] << endl;
-	}*/
 
 	delete[] shifr;
 }
