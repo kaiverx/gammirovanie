@@ -71,7 +71,6 @@ int main()
 	cout << "Гаммирование" << endl;
 
 	int number;
-
 	//создание строки
 	string stroka;
 	getline(cin, stroka);
@@ -102,14 +101,32 @@ int main()
 		//кодирование при помощи ключа
 		int decimal = addBinary(binary, key);
 		//перевод из двоичной в десятичную
-		ascii[i] = binaryToDecimal(decimal);
+		int ASCII = binaryToDecimal(decimal);
+		//проверка на выхождение за пределы аски кода
+		if (ASCII == 256)
+			ascii[i] = 0;
+		else if (ASCII > 256)
+		{
+			int ASCII_change = ASCII;
+			int k = 0;
+			while (ASCII_change > 255)
+			{
+				ASCII_change -= 255;
+				k++;
+			}
+			ascii[i] = ASCII - 255 * k;
+		}
+		else
+			ascii[i] = ASCII;
 		//cout << "ASCII i " << i << ": " << ascii[i]<<endl;
+	
 	}
 
 	//преобразование из ascii в char
 	for (int i = 0; i < n-1; i++)
 	{
 		shifr[i] = static_cast<char>(ascii[i]);
+		cout << i << " " << shifr[i]<<endl;
 	}
 
 	delete[] shifr;
