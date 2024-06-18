@@ -3,7 +3,8 @@
 
 using namespace std;
 
-int decimalToBinaryInt(int k) {
+int decimalToBinary(int k) 
+{
 	int binaryNum = 0;
 	int place = 1; // Текущий разряд двоичного числа
 
@@ -16,8 +17,27 @@ int decimalToBinaryInt(int k) {
 
 	return binaryNum;
 }
+int binaryToDecimal(int binary)
+{
+	int decimal = 0;
+	int power = 1; // Начинаем с 2^0
 
-int addBinary(int a, int b) {
+	while (binary > 0) {
+		// Извлекаем младший бит (0 или 1)
+		int lastDigit = binary % 10;
+		// Добавляем соответствующую степень двойки к результату
+		decimal += lastDigit * power;
+		// Переходим к следующей степени двойки
+		power *= 2;
+		// Удаляем младший бит
+		binary /= 10;
+	}
+
+	return decimal;
+}
+
+int addBinary(int a, int b) 
+{
 	int result = 0; // Результат сложения
 	int carry = 0;  // Перенос
 	int power = 1;  // Текущая степень двойки
@@ -77,11 +97,12 @@ int main()
 	for (int i = 0; i < n-1; i++)
 	{
 		ascii[i] = static_cast<int>(shifr[i]);
-		//cout << "ASCII i " << i << ": " << ascii[i] << " -> ";
-		int binary = decimalToBinaryInt(ascii[i]);
-		//cout << "Binary: " << binary << endl;
+		//cout << "ASCII i " << i << ": " << ascii[i] <<endl;
+		int binary = decimalToBinary(ascii[i]);
 		//кодирование при помощи ключа
-		ascii[i] = addBinary(binary, key);
+		int decimal = addBinary(binary, key);
+		//перевод из двоичной в десятичную
+		ascii[i] = binaryToDecimal(decimal);
 		//cout << "ASCII i " << i << ": " << ascii[i]<<endl;
 	}
 
