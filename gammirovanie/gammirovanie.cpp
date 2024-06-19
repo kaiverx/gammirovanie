@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <cstdlib>
-
+#include <locale>
 using namespace std;
 
 int decimalToBinary(int k)
