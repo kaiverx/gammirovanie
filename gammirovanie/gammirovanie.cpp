@@ -2,8 +2,9 @@
 #include <string>
 #include <cstdlib>
 #include <locale>
-using namespace std;
 
+using namespace std;
+//перевод из десятичной в двоичную
 int decimalToBinary(int k)
 {
     int binaryNum = 0;
@@ -18,7 +19,7 @@ int decimalToBinary(int k)
 
     return binaryNum;
 }
-
+//перевод из двоичной в десятичную
 int binaryToDecimal(int binary)
 {
     int decimal = 0;
@@ -37,7 +38,7 @@ int binaryToDecimal(int binary)
 
     return decimal;
 }
-
+//сложение с ключом
 int addBinary(int a, int b)
 {
     int result = 0; // Результат сложения
@@ -65,7 +66,7 @@ int addBinary(int a, int b)
 
     return result;
 }
-
+//вычитание с ключом
 int subtractBinary(int a, int b) {
     int result = 0; // Результат вычитания
     int borrow = 0; // Заимствование
@@ -110,6 +111,7 @@ int main()
     int* ascii = nullptr;
     char* shifr = nullptr;
     int n = 0;
+    int check_punkt = 0;
 
     for (;;)
     {
@@ -158,11 +160,13 @@ int main()
             cin >> key;
             cin.ignore(); // Игнорируем символ новой строки после ввода ключа
             cout << endl;
+            check_punkt = 1;
             break;
 
         case(2):
-            if (ascii == nullptr || shifr == nullptr) {
-                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+            if (check_punkt == 0)
+            {
+                cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1)." << endl;
                 break;
             }
 
@@ -192,11 +196,18 @@ int main()
                 else
                     ascii[i] = ASCII;
             }
+            check_punkt = 2;
             break;
 
         case(3):
-            if (ascii == nullptr) {
-                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+            if (check_punkt == 0)
+            {
+                cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
+                break;
+            }
+            else if (check_punkt == 1)
+            {
+                cout << "Невозможно выполнить. Сначала выполните шифрование текста (пункт 2)." << endl;
                 break;
             }
 
@@ -211,15 +222,23 @@ int main()
             break;
 
         case(4):
-            if (ascii == nullptr)
+            if (check_punkt == 0)
             {
-                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+                cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
+                break;
+            }
+            else if (check_punkt == 1)
+            {
+                cout << "Невозможно выполнить. Сначала выполните шифрование текста (пункт 2)." << endl;
                 break;
             }
             // Преобразование из char в ASCII и дешифрование
             for (int i = 0; i < n - 1; i++)
             {
                 ascii[i] = static_cast<int>(shifr[i]);
+                int check_key = binaryToDecimal(key);
+                while (ascii[i] < check_key)
+                    ascii[i] += 256;
                 int binary = decimalToBinary(ascii[i]);
                 // Декодирование при помощи ключа
                 int decodedBinary = subtractBinary(binary, key);
@@ -245,11 +264,23 @@ int main()
                 // Запись дешифрованного символа в массив
                 shifr[i] = static_cast<char>(ascii[i]);
             }
+            check_punkt = 3;
             break;
 
         case(5):
-            if (ascii == nullptr) {
-                cout << "Сначала введите текст и ключ (пункт 1)." << endl;
+            if (check_punkt==0) 
+            {
+                cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2) и дешифровку текста (пункт 4)." << endl;
+                break;
+            }
+            else if (check_punkt == 1)
+            {
+                cout << "Невозможно выполнить. Сначала выполните шифрование текста (пункт 2) и дешифровку текста (пункт 4)." << endl;
+                break;
+            }
+            else if (check_punkt == 2)
+            {
+                cout << "Невозможно выполнить. Сначала выполните дешифровку текста (пункт 4)." << endl;
                 break;
             }
 
@@ -260,6 +291,7 @@ int main()
                 cout << shifr[i];
             }
             cout << endl;
+            check_punkt == 0;
             break;
 
         default:
