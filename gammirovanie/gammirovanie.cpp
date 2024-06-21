@@ -2,8 +2,10 @@
 #include <string>
 #include <cstdlib>
 #include <locale>
+#include <limits>
 
 using namespace std;
+
 //перевод из десятичной в двоичную
 int decimalToBinary(int k)
 {
@@ -19,6 +21,7 @@ int decimalToBinary(int k)
 
     return binaryNum;
 }
+
 //перевод из двоичной в десятичную
 int binaryToDecimal(int binary)
 {
@@ -38,6 +41,7 @@ int binaryToDecimal(int binary)
 
     return decimal;
 }
+
 //сложение с ключом
 int addBinary(int a, int b)
 {
@@ -66,6 +70,7 @@ int addBinary(int a, int b)
 
     return result;
 }
+
 //вычитание с ключом
 int subtractBinary(int a, int b) {
     int result = 0; // Результат вычитания
@@ -100,6 +105,16 @@ int subtractBinary(int a, int b) {
     return result;
 }
 
+// Функция для проверки, является ли строка двоичным числом
+bool isBinaryString(const string& str) {
+    for (char c : str) {
+        if (c != '0' && c != '1') {
+            return false;
+        }
+    }
+    return true;
+}
+
 int main()
 {
     setlocale(LC_ALL, "russian");
@@ -115,17 +130,30 @@ int main()
 
     for (;;)
     {
+        cout << endl;
         cout << "1. Введите '1' для введения текста и ключа" << endl;
         cout << "2. Введите '2' для шифрования текста" << endl;
         cout << "3. Введите '3' для вывода зашифрованного текста" << endl;
         cout << "4. Введите '4' для декодирования текста при помощи ключа" << endl;
         cout << "5. Введите '5' для вывода дешифрованного текста" << endl;
-        cout << "6. Введите '0' для завершения работы программы" << endl;
+        cout << "6. Введите '6' для перехода к меню для тестов" << endl;
+        cout << "7. Введите '0' для завершения работы программы" << endl;
         cout << "Выберите нужный вам пункт и введите нужное значение с клавиатуры: ";
         int menu;
         cin >> menu;
         cout << endl;
+
+        if (cin.fail()) {
+            // Проверка на некорректный ввод
+            cin.clear(); // Сбрасываем состояние ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Удаляем неверный ввод из буфера
+            cout << "Некорректный ввод! Пожалуйста, введите числовое значение." << endl; 
+            cout << endl;
+            continue; // Повторяем ввод
+        }
+       
         cin.ignore(); // Игнорируем символ новой строки после ввода пункта меню
+
         if (menu == 0)
         {
             delete[] ascii;
@@ -135,7 +163,7 @@ int main()
 
         switch (menu)
         {
-        case(1):
+        case (1): {
             cout << "Введите текст: ";
             getline(cin, stroka);
 
@@ -155,15 +183,25 @@ int main()
             strcpy_s(shifr, n, stroka.c_str());
             cout << "Введенная строка: " << shifr << endl;
 
-            // Создаем ключ
-            cout << "Введите двоичный ключ для шифрования текста: ";
-            cin >> key;
+            // Ввод и проверка ключа
+            string keyInput;
+            do {
+                cout << "Введите двоичный ключ для шифрования текста: ";
+                cin >> keyInput;
+                if (!isBinaryString(keyInput))
+                    cout << "Некорректный ввод! Ключ должен содержать только символы '0' и '1'." << endl;
+            } while (!isBinaryString(keyInput));
+
+            // Преобразуем строку с ключом в целое число
+            key = stoi(keyInput, nullptr, 2);
+
             cin.ignore(); // Игнорируем символ новой строки после ввода ключа
             cout << endl;
             check_punkt = 1;
             break;
+        }
 
-        case(2):
+        case (2):
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1)." << endl;
@@ -199,7 +237,7 @@ int main()
             check_punkt = 2;
             break;
 
-        case(3):
+        case (3):
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
@@ -221,7 +259,7 @@ int main()
             cout << endl;
             break;
 
-        case(4):
+        case (4):
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
@@ -267,8 +305,8 @@ int main()
             check_punkt = 3;
             break;
 
-        case(5):
-            if (check_punkt==0) 
+        case (5):
+            if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2) и дешифровку текста (пункт 4)." << endl;
                 break;
@@ -291,9 +329,17 @@ int main()
                 cout << shifr[i];
             }
             cout << endl;
-            check_punkt == 0;
+            check_punkt = 0; // Исправлено на присваивание, а не проверку
             break;
+            /*
+            case (6):
+                cout << "ТЕСТИРОВАНИЕ" << endl;
+                for (;;)
+                {
 
+                }
+                break;
+            */
         default:
             cout << "Неверный пункт меню!!! Введите значение, которое указано в нужном вам пункте, либо введите '0' для завершения работы программы." << endl;
             break;
