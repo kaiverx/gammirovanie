@@ -2,11 +2,31 @@
 #include <string>
 #include <cstdlib>
 #include <locale>
-#include <limits>
+#include <stdexcept> // Для обработки исключений
 
 using namespace std;
 
-//перевод из десятичной в двоичную
+bool isBinary(int key) {
+    while (key > 0) {
+        int digit = key % 10;
+        if (digit != 0 && digit != 1) {
+            return false;
+        }
+        key /= 10;
+    }
+    return true;
+}
+
+bool isNumber(const string& str) {
+    for (char c : str) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// перевод из десятичной в двоичную
 int decimalToBinary(int k)
 {
     int binaryNum = 0;
@@ -22,7 +42,7 @@ int decimalToBinary(int k)
     return binaryNum;
 }
 
-//перевод из двоичной в десятичную
+// перевод из двоичной в десятичную
 int binaryToDecimal(int binary)
 {
     int decimal = 0;
@@ -42,7 +62,7 @@ int binaryToDecimal(int binary)
     return decimal;
 }
 
-//сложение с ключом
+// сложение с ключом
 int addBinary(int a, int b)
 {
     int result = 0; // Результат сложения
@@ -71,7 +91,7 @@ int addBinary(int a, int b)
     return result;
 }
 
-//вычитание с ключом
+// вычитание с ключом
 int subtractBinary(int a, int b) {
     int result = 0; // Результат вычитания
     int borrow = 0; // Заимствование
@@ -105,16 +125,6 @@ int subtractBinary(int a, int b) {
     return result;
 }
 
-// Функция для проверки, является ли строка двоичным числом
-bool isBinaryString(const string& str) {
-    for (char c : str) {
-        if (c != '0' && c != '1') {
-            return false;
-        }
-    }
-    return true;
-}
-
 int main()
 {
     setlocale(LC_ALL, "russian");
@@ -128,34 +138,34 @@ int main()
     int n = 0;
     int check_punkt = 0;
 
-    for (;;)
-    {
-        cout << endl;
+    for (;;) {
         cout << "1. Введите '1' для введения текста и ключа" << endl;
         cout << "2. Введите '2' для шифрования текста" << endl;
         cout << "3. Введите '3' для вывода зашифрованного текста" << endl;
         cout << "4. Введите '4' для декодирования текста при помощи ключа" << endl;
         cout << "5. Введите '5' для вывода дешифрованного текста" << endl;
-        cout << "6. Введите '6' для перехода к меню для тестов" << endl;
-        cout << "7. Введите '0' для завершения работы программы" << endl;
+        cout << "6. Введите '0' для завершения работы программы" << endl;
         cout << "Выберите нужный вам пункт и введите нужное значение с клавиатуры: ";
-        int menu;
-        cin >> menu;
-        cout << endl;
 
-        if (cin.fail()) {
-            // Проверка на некорректный ввод
-            cin.clear(); // Сбрасываем состояние ошибки
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Удаляем неверный ввод из буфера
-            cout << "Некорректный ввод! Пожалуйста, введите числовое значение." << endl; 
-            cout << endl;
-            continue; // Повторяем ввод
-        }
-       
+        string menuStr;
+        cin >> menuStr;
+        cout << endl;
         cin.ignore(); // Игнорируем символ новой строки после ввода пункта меню
 
-        if (menu == 0)
-        {
+        // Проверка корректности ввода меню
+        if (!isNumber(menuStr)) {
+            cout << "Ошибка: Пункт меню должен быть числовым значением." << endl;
+            continue;
+        }
+
+        int menu = stoi(menuStr);
+
+        if (menu < 0 || menu > 6) {
+            cout << "Ошибка: Неверный пункт меню." << endl;
+            continue;
+        }
+
+        if (menu == 0) {
             delete[] ascii;
             delete[] shifr;
             break;
@@ -163,7 +173,7 @@ int main()
 
         switch (menu)
         {
-        case (1): {
+        case(1): {
             cout << "Введите текст: ";
             getline(cin, stroka);
 
@@ -184,24 +194,40 @@ int main()
             cout << "Введенная строка: " << shifr << endl;
 
             // Ввод и проверка ключа
-            string keyInput;
-            do {
+            while (true) {
+                string keyStr;
                 cout << "Введите двоичный ключ для шифрования текста: ";
-                cin >> keyInput;
-                if (!isBinaryString(keyInput))
-                    cout << "Некорректный ввод! Ключ должен содержать только символы '0' и '1'." << endl;
-            } while (!isBinaryString(keyInput));
+                cin >> keyStr;
+                cin.ignore(); // Игнорируем символ новой строки после ввода ключа
 
-            // Преобразуем строку с ключом в целое число
-            key = stoi(keyInput, nullptr, 2);
-
-            cin.ignore(); // Игнорируем символ новой строки после ввода ключа
+                // Проверка корректности ввода
+                if (isNumber(keyStr)) {
+                    try {
+                        key = stoi(keyStr);
+                        if (isBinary(key)) {
+                            cout << "Ключ принят." << endl;
+                            check_punkt = 1;
+                            break; // Выходим из цикла ввода ключа
+                        }
+                        else {
+                            cout << "Ошибка: Ключ должен быть двоичным числом." << endl;
+                        }
+                    }
+                    catch (invalid_argument&) {
+                        cout << "Ошибка: Неверный формат ключа." << endl;
+                    }
+                    catch (out_of_range&) {
+                        cout << "Ошибка: Ключ слишком длинный." << endl;
+                    }
+                }
+                else {
+                    cout << "Ошибка: Ключ должен быть числовым значением." << endl;
+                }
+            }
             cout << endl;
-            check_punkt = 1;
             break;
         }
-
-        case (2):
+        case(2): {
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1)." << endl;
@@ -234,10 +260,11 @@ int main()
                 else
                     ascii[i] = ASCII;
             }
+            cout << "Текст зашифрован и сохранен" << endl;
             check_punkt = 2;
             break;
-
-        case (3):
+        }
+        case(3): {
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
@@ -258,8 +285,8 @@ int main()
             }
             cout << endl;
             break;
-
-        case (4):
+        }
+        case(4): {
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2)." << endl;
@@ -302,10 +329,11 @@ int main()
                 // Запись дешифрованного символа в массив
                 shifr[i] = static_cast<char>(ascii[i]);
             }
+            cout << "Текст дешифрован и сохранен" << endl;
             check_punkt = 3;
             break;
-
-        case (5):
+        }
+        case(5): {
             if (check_punkt == 0)
             {
                 cout << "Невозможно выполнить. Сначала выполните ввод текста и ключа (пункт 1), а так же выполните шифрование текста (пункт 2) и дешифровку текста (пункт 4)." << endl;
@@ -329,17 +357,9 @@ int main()
                 cout << shifr[i];
             }
             cout << endl;
-            check_punkt = 0; // Исправлено на присваивание, а не проверку
+            check_punkt = 0;
             break;
-            /*
-            case (6):
-                cout << "ТЕСТИРОВАНИЕ" << endl;
-                for (;;)
-                {
-
-                }
-                break;
-            */
+        }
         default:
             cout << "Неверный пункт меню!!! Введите значение, которое указано в нужном вам пункте, либо введите '0' для завершения работы программы." << endl;
             break;
